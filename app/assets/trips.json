@@ -1,0 +1,41 @@
+[
+    {
+        "objectID": "2800952",
+        "productCode": "HPPC",
+        "productName": "Premium Sri Lanka",
+        "departureDate": "2026-06-15",
+        "durationDays": 10,
+        "destination": "Sri Lanka",
+        "travelStyle": "Premium",
+        "price_usd": 1500,
+        "price_aud": 2250,
+        "seatsAvailable": 8,
+        "isGuaranteed": true
+    },
+    {
+        "objectID": "2800953",
+        "productCode": "HPPC",
+        "productName": "Premium Sri Lanka",
+        "departureDate": "2026-07-20",
+        "durationDays": 10,
+        "destination": "Sri Lanka",
+        "travelStyle": "Premium",
+        "price_usd": 1650,
+        "price_aud": 2400,
+        "seatsAvailable": 2,
+        "isGuaranteed": true
+    },
+    {
+        "objectID": "3100421",
+        "productCode": "BOSL",
+        "productName": "Best of Sri Lanka",
+        "departureDate": "2026-06-10",
+        "durationDays": 14,
+        "destination": "Sri Lanka",
+        "travelStyle": "Adventure",
+        "price_usd": 1200,
+        "price_aud": 1800,
+        "seatsAvailable": 12,
+        "isGuaranteed": false
+    }
+]
