@@ -3,234 +3,168 @@ import type { TripRecord } from "~/types/trip";
 
 const algoliaClient = useAlgoliaRef();
 
-const PRIMARY_INDEX = "trips";
-const sortOptions = [
-  { label: "Best Match (Relevance)", value: PRIMARY_INDEX },
-  { label: "Price: Cheapest First", value: "trips_price_asc" },
-  { label: "Price: Most Expensive First", value: "trips_price_desc" },
-];
-
-const currentIndexName = ref(PRIMARY_INDEX);
-
 useHead({
-  title: "Intrepid Mini Search — Find Your Next Adventure",
+  title: "Intrepid Mini Search",
   meta: [
     {
       name: "description",
-      content:
-        "Search and filter travel trips to Sri Lanka and beyond. Powered by Algolia.",
+      content: "Minimal Algolia InstantSearch learning demo.",
     },
   ],
 });
 </script>
 
 <template>
-  <div class="search-page">
-    <header class="search-header">
-      <h1>Find Your Next Adventure</h1>
-      <p>Search thousands of departures instantly</p>
-    </header>
+  <main class="page">
+    <h1>Algolia Mini Search</h1>
 
-    <main class="search-layout">
+    <p class="subtitle">Search trips and filter by destination.</p>
+
+    <ClientOnly>
       <ais-instant-search
-        :index-name="currentIndexName"
+        index-name="trips"
         :search-client="algoliaClient"
-        :insights="true"
       >
-        <div class="search-controls">
-          <ais-search-box
-            placeholder="Search trips, destinations..."
-            class="search-box"
-          />
+        <ais-configure :clickAnalytics="true" />
 
-          <div class="sort-control">
-            <label for="sort-select">Sort by:</label>
-            <select
-              id="sort-select"
-              v-model="currentIndexName"
-              class="sort-select"
-            >
-              <option
-                v-for="option in sortOptions"
-                :key="option.value"
-                :value="option.value"
-              >
-                {{ option.label }}
-              </option>
-            </select>
+        <ais-search-box placeholder="Search trips" />
+
+        <section class="filters">
+          <h2>Filters</h2>
+
+          <div class="filter-item">
+            <p>Destination</p>
+            <ais-refinement-list attribute="destination" />
           </div>
-        </div>
 
-        <div class="content-area">
-          <aside class="filters-panel">
-            <h2 class="filters-title">Filter Results</h2>
-
-            <div class="filter-group">
-              <h3>Destination</h3>
-              <ais-refinement-list attribute="destination" />
-            </div>
-
-            <div class="filter-group">
-              <h3>Travel Style</h3>
-              <ais-refinement-list attribute="travelStyle" />
-            </div>
-
-            <div class="filter-group">
-              <h3>Guaranteed Departures Only</h3>
-
-              <ais-toggle-refinement
-                attribute="isGuaranteed"
-                label="Show guaranteed departures only"
-                :on="true"
-              />
-            </div>
-
-            <ais-clear-refinements class="clear-filters-btn">
-              <template #resetLabel> ✖ Clear All Filters </template>
-            </ais-clear-refinements>
-          </aside>
-
-          <div class="results-panel">
-            <ais-stats class="results-stats" />
-
-            <ais-hits>
-              <template #item="{ item }">
-                <TripCard :trip="item as TripRecord" />
-              </template>
-            </ais-hits>
-
-            <ais-pagination class="pagination" />
+          <div class="filter-item">
+            <p>Travel Style</p>
+            <ais-refinement-list attribute="travelStyle" />
           </div>
-        </div>
+
+          <div class="filter-item">
+            <p>Guaranteed Only</p>
+            <ais-toggle-refinement
+              attribute="isGuaranteed"
+              label="Show guaranteed departures"
+              :on="true"
+            />
+          </div>
+
+          <ais-clear-refinements />
+        </section>
+
+        <ais-stats />
+
+        <ais-hits>
+          <template #item="{ item }">
+            <TripCard :trip="item as TripRecord" />
+          </template>
+        </ais-hits>
+
+        <ais-pagination />
       </ais-instant-search>
-    </main>
-  </div>
+
+      <template #fallback>
+        <p>Loading search...</p>
+      </template>
+    </ClientOnly>
+  </main>
 </template>
 
 <style scoped>
-.search-page {
-  min-height: 100vh;
-  background: #f0f4f8;
-  font-family: "Inter", sans-serif;
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  font-family: Arial, sans-serif;
 }
 
-.search-header {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  color: white;
-  padding: 48px 32px;
-  text-align: center;
-}
-
-.search-header h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin: 0 0 8px 0;
-}
-
-.search-header p {
-  font-size: 1.1rem;
-  opacity: 0.8;
+h1 {
   margin: 0;
 }
 
-.search-layout {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px 16px;
+.subtitle {
+  margin: 0.5rem 0 1.5rem;
+  color: #555;
 }
 
-.search-controls {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.search-box {
-  flex: 1;
-  min-width: 280px;
-}
-
-.sort-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #374151;
-}
-
-.sort-select {
-  padding: 10px 16px;
-  border: 1px solid #d1d5db;
+.filters {
+  border: 1px solid #ddd;
   border-radius: 8px;
-  background: white;
-  font-size: 0.95rem;
-  cursor: pointer;
-  outline: none;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #fff;
 }
 
-.sort-select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-.content-area {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-}
-
-.filters-panel {
-  width: 240px;
-  flex-shrink: 0;
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.filters-title {
+.filters h2 {
+  margin: 0 0 0.75rem;
   font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 16px 0;
-  color: #111827;
 }
 
-.filter-group {
-  margin-bottom: 20px;
+.filter-item {
+  margin-bottom: 0.75rem;
 }
 
-.filter-group h3 {
-  font-size: 0.85rem;
+.filter-item p {
+  margin: 0 0 0.35rem;
   font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0 0 8px 0;
 }
 
-.clear-filters-btn {
-  width: 100%;
-  margin-top: 8px;
+:deep(.ais-SearchBox) {
+  margin-bottom: 1rem;
 }
 
-.results-panel {
-  flex: 1;
-  min-width: 0;
+:deep(.ais-RefinementList) {
+  margin-bottom: 0;
 }
 
-.results-stats {
-  margin-bottom: 12px;
-  font-size: 0.9rem;
-  color: #6b7280;
+:deep(.ais-Stats) {
+  margin-bottom: 1rem;
+  color: #444;
 }
 
-.pagination {
-  margin-top: 32px;
+:deep(.ais-Pagination) {
+  margin-top: 1rem;
+}
+
+:deep(.ais-Pagination-list) {
   display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+:deep(.ais-Pagination-item) {
+  margin: 0;
+}
+
+:deep(.ais-Pagination-link) {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.6rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  color: #222;
+  background: #fff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+:deep(.ais-Pagination-item--selected .ais-Pagination-link) {
+  background: #1f6feb;
+  border-color: #1f6feb;
+  color: #fff;
+}
+
+:deep(.ais-Pagination-item--disabled .ais-Pagination-link) {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 </style>
+
